@@ -48,8 +48,9 @@ class MedicalReport(BaseModel):
         return cleaned_value
 
 
-# 2. Client Initialization
-client = genai.Client(http_options={"api_version": "v1beta"})
+# 2. Client Initialization (Lazy loading for testability)
+def get_genai_client() -> genai.Client:
+    return genai.Client(http_options={"api_version": "v1beta"})
 
 
 # 3. API Endpoints
@@ -75,6 +76,7 @@ def extract_report(payload: ExtractionRequest):
 
     # Step 1: Call LLM
     try:
+        client = get_genai_client()
         response = client.models.generate_content(
             model="gemini-2.5-flash",
             contents=prompt,
